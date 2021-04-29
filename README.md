@@ -1,3 +1,9 @@
+## Sharebite Restaurant Frontend
+
+The app is deployed on AWS-S3 using static hosting. <br>
+
+App URL:  http://sharebite-restaurant-front-end.s3-website-us-west-1.amazonaws.com/
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
