@@ -45,18 +45,13 @@ const Menu = () => {
             }
         ]
     }
+    
     const [restaurantMenu, setRestaurantMenu] = useState(sampleData);
     const [menuItems, setMenuItems] = useState([]);
     const [itemOptions, setItemOptions] = useState([]);
     const [optionChoices, setOptionChoices] = useState([]);
 
-    //selected menu
-    const [selectedSection, setSelectedSection] = useState();
-    const [selectedItem, setSelectedItem] = useState();
-    const [selectedOption, setSelectedOption] = useState();
-    const [selectedChoice, setSelectedChoice] = useState();
-
-    //
+    //selection indices
     const [selectedSectionIndex, setSelectedSectionIndex] = useState(-1);
     const [selectedItemIndex, setSelectedItemIndex] = useState(-1);
     const [selectedOptionIndex, setSelectedOptionIndex] = useState(-1);
@@ -68,10 +63,10 @@ const Menu = () => {
     const [show, setShow] = useState(false);
     const [type, setType] = useState('');
 
+
     const handleClose = () => {
         setType('');
         setShow(false);
-        
     }
 
     const handleShow = (menuType) => {
@@ -79,23 +74,11 @@ const Menu = () => {
         setShow(true);
     }
 
-    const handleMenuSelection = (clickedMenu) => {
+    const handleMenuSelection = (selectedIndex) => {
 
-        let items = [];
-        let menuSections = restaurantMenu["sections"];
-        let sectionIndex = -1;
-        menuSections.map((section, index) => {
+        let items = cloneDeep(restaurantMenu["sections"][selectedIndex]["items"]);
 
-            console.log({section});
-            if(section.name === clickedMenu){
-                items = section["items"];
-                sectionIndex = index;
-            }
-        });
-
-        console.log(items);
-        setSelectedSection(clickedMenu);
-        setSelectedSectionIndex(sectionIndex);
+        setSelectedSectionIndex(selectedIndex);
         setSelectedItemIndex(-1);
         setSelectedOptionIndex(-1);
         setSelectedChoiceIndex(-1);
@@ -104,74 +87,27 @@ const Menu = () => {
         setOptionChoices([]);
     }
 
-    const handleItemSelection = (clickedItem) => {
+    const handleItemSelection = (selectedIndex) => {
 
-        let options = [];
-        console.log(menuItems);
+        let options = cloneDeep(restaurantMenu["sections"][selectedSectionIndex]["items"][selectedIndex]["options"]);
 
-        let itemIndex = -1;
-        menuItems.map((item, index) => {
-
-            console.log({item});
-            if(item.title === clickedItem){
-                options = item["options"];
-                itemIndex = index;
-            }
-        });
-
-        console.log(options);
-        setSelectedItem(clickedItem);
-        setSelectedItemIndex(itemIndex);
+        setSelectedItemIndex(selectedIndex);
         setSelectedOptionIndex(-1);
         setSelectedChoiceIndex(-1);
         setItemOptions(options);
         setOptionChoices([]);
     }
 
-    const handleOptionSelection = (clickedOption) => {
+    const handleOptionSelection = (selectedIndex) => {
 
-        let choices = [];
-        console.log(itemOptions);
+        let choices = cloneDeep(restaurantMenu["sections"][selectedSectionIndex]["items"][selectedItemIndex]["options"][selectedIndex]["choices"]);
 
-        let optionIndex = -1;
-        itemOptions.map((option, index) => {
-
-            console.log({option});
-            if(option.name === clickedOption){
-                choices = option["choices"];
-                optionIndex = index;
-            }
-        });
-
-        console.log(choices);
-        setSelectedOption(clickedOption);
-        setSelectedOptionIndex(optionIndex);
+        setSelectedOptionIndex(selectedIndex);
         setSelectedChoiceIndex(-1);
         setOptionChoices(choices);
     }
 
-    const handleChoiceSelection = (clickedChoice) => {
-
-        
-        let choiceIndex = -1;
-        optionChoices.map((choice, index) => {
-
-           
-            if(choice.name === clickedChoice){
-                choiceIndex = index;
-            }
-        });
-
-        //console.log(choices);
-        //setSelectedOption(clickedOption);
-        //setSelectedOptionIndex(optionIndex);
-        setSelectedChoiceIndex(choiceIndex);
-        //setOptionChoices(choices);
-    }
-
     const handleInputChange = (e) => {
-        console.log(e.target.name);
-        console.log(e.target.value);
         setNewProperty(e.target.value);
     }
 
@@ -185,7 +121,6 @@ const Menu = () => {
     const addNewProperty = (sectionType, newValue) => {
 
         let restaurantMenuCopy = cloneDeep(restaurantMenu);
-        let index = -1;
         switch (sectionType){
             case TYPE.SECTION :
                 let newSection = {
@@ -193,7 +128,6 @@ const Menu = () => {
                     "items": []
                 }
                 restaurantMenuCopy["sections"].push(newSection);
-                console.log(restaurantMenuCopy);
                 setRestaurantMenu(restaurantMenuCopy);
                 break;
             case TYPE.ITEM:
@@ -203,7 +137,6 @@ const Menu = () => {
                 }
 
                 restaurantMenuCopy["sections"][selectedSectionIndex]["items"].push(newItem);
-                // console.log(restaurantMenuCopy);
                 setRestaurantMenu(restaurantMenuCopy);
                 setMenuItems(restaurantMenuCopy["sections"][selectedSectionIndex]["items"]);
                 break;
@@ -214,7 +147,6 @@ const Menu = () => {
                 }
 
                 restaurantMenuCopy["sections"][selectedSectionIndex]["items"][selectedItemIndex]["options"].push(newOption);
-                console.log(restaurantMenuCopy);
                 setRestaurantMenu(restaurantMenuCopy);
                 setMenuItems(restaurantMenuCopy["sections"][selectedSectionIndex]["items"]);
                 setItemOptions(restaurantMenuCopy["sections"][selectedSectionIndex]["items"][selectedItemIndex]["options"]);
@@ -225,7 +157,6 @@ const Menu = () => {
                 }
 
                 restaurantMenuCopy["sections"][selectedSectionIndex]["items"][selectedItemIndex]["options"][selectedOptionIndex]["choices"].push(newChoice);
-                console.log(restaurantMenuCopy);
                 setRestaurantMenu(restaurantMenuCopy);
                 setMenuItems(restaurantMenuCopy["sections"][selectedSectionIndex]["items"]);
                 setItemOptions(restaurantMenuCopy["sections"][selectedSectionIndex]["items"][selectedItemIndex]["options"]);
@@ -242,7 +173,7 @@ const Menu = () => {
             <Fragment>
                 {
                     sections.map((section, i) => {
-                        return <Card key={section.name} selected={i === selectedSectionIndex}  cardText={section.name} customClick={() => handleMenuSelection(section.name)} />
+                        return <Card key={section.name} selected={i === selectedSectionIndex}  cardText={section.name} customClick={() => handleMenuSelection(i)} />
                     })
                 }
             </Fragment>
@@ -251,7 +182,6 @@ const Menu = () => {
 
     const renderItemSection = (items) => {
 
-        console.log("items");
         if(items && items.length)
         {
             return (
@@ -259,8 +189,7 @@ const Menu = () => {
                 <Fragment>
                     {
                         items.map((item,i) => {
-                            console.log(item);
-                            return <Card key={item.title} selected={i === selectedItemIndex}  cardText={item.title} customClick={() => handleItemSelection(item.title) }/>
+                            return <Card key={item.title} selected={i === selectedItemIndex}  cardText={item.title} customClick={() => handleItemSelection(i) }/>
                         })
                     }
                 </Fragment>
@@ -279,7 +208,7 @@ const Menu = () => {
                 <Fragment>
                     {
                         options.map((option,i) => {
-                            return <Card cardText={option.name} selected={i === selectedOptionIndex} customClick={() => handleOptionSelection(option.name)}/>
+                            return <Card cardText={option.name} selected={i === selectedOptionIndex} customClick={() => handleOptionSelection(i)}/>
                         })
                     }
                 </Fragment>
@@ -298,7 +227,7 @@ const Menu = () => {
                 <Fragment>
                     {
                         optionChoices.map((optionChoice,i) => {
-                            return <Card cardText={optionChoice.name} selected={i === selectedChoiceIndex} customClick={() => handleChoiceSelection(optionChoice.name)}/>
+                            return <Card cardText={optionChoice.name} selected={i === selectedChoiceIndex} customClick={() => setSelectedChoiceIndex(i)}/>
                         })
                     }
                 </Fragment>

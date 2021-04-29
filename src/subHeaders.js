@@ -3,7 +3,6 @@ import "./App.css";
 
 const SubHeader = (props) => {
 
-    console.log(props);
     return (
         <div className="subHeader">
           <div className="col-md-8">{props.name}</div>
